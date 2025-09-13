@@ -80,7 +80,8 @@ def recommend_from_filtered(filtered_df, top_n=5):
     scores = sorted(scores, key=lambda x: x[1], reverse=True)
 
     top_indices = [i[0] for i in scores[1:top_n+1]]
-    return df.iloc[top_indices]["recommended_furniture"].tolist()
+    recs = df.iloc[top_indices]["recommended_furniture"].drop_duplicates().tolist()
+    return recs
 
 recommendations = recommend_from_filtered(filtered_df)
 
@@ -99,12 +100,20 @@ else:
         with st.container():
             st.markdown(
                 f"""
-                <div style="padding:15px; border-radius:12px; background-color:#f9f9f9; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
-                    <h4 style="margin:0;">{i}. {item}</h4>
+                <div style="
+                    padding:15px; 
+                    border-radius:12px; 
+                    background-color:#ffffff; 
+                    border:1px solid #ddd;
+                    margin-bottom:12px; 
+                    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+                ">
+                    <h4 style="margin:0; color:#333;">{i}. {item}</h4>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
+
 
 # =====================
 # Surprise Me Feature
@@ -113,3 +122,4 @@ st.subheader("🎲 Feeling Lucky?")
 if st.button("Surprise Me"):
     random_item = df.sample(1).iloc[0]["recommended_furniture"]
     st.info(f"✨ Surprise Pick: **{random_item}**")
+
