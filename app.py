@@ -1,6 +1,7 @@
 import streamlit as st
 import pickle
 import pandas as pd
+import random
 
 # =====================
 # Load Model Artifacts
@@ -103,13 +104,27 @@ st.subheader("📋 Recommended Options")
 if recommendations.empty:
     st.warning("No recommendations found. Try adjusting your filters.")
 else:
-    st.dataframe(recommendations, use_container_width=True)
+    # Card-style display
+    for i, row in recommendations.iterrows():
+        st.markdown(f"""
+        ---
+        **{row['recommended_furniture']}**
+        - 🏠 Apartment: {row['apartment_type']}
+        - 📍 Location: {row['location']}
+        - 💰 Budget: {row['budget_range']}
+        - 🎨 Style: {row['preferred_style']}
+        """)
 
-    # Download Button
-    csv = recommendations.to_csv(index=False).encode("utf-8")
-    st.download_button(
-        label="⬇️ Download Recommendations",
-        data=csv,
-        file_name="furniture_recommendations.csv",
-        mime="text/csv",
-    )
+# =====================
+# Surprise Me Feature
+# =====================
+st.subheader("🎲 Feeling Lucky?")
+if st.button("Surprise Me"):
+    random_row = df.sample(1).iloc[0]
+    st.info(f"✨ Surprise Pick: **{random_row['recommended_furniture']}**")
+    st.markdown(f"""
+    - 🏠 Apartment: {random_row['apartment_type']}
+    - 📍 Location: {random_row['location']}
+    - 💰 Budget: {random_row['budget_range']}
+    - 🎨 Style: {random_row['preferred_style']}
+    """)
