@@ -108,7 +108,7 @@ else:
                     margin-bottom:12px; 
                     box-shadow:0 2px 8px rgba(0,0,0,0.08);
                 ">
-                    <h4 style="margin:0; color:#333;">{i}. {item}</h4>
+                    <h4 style="margin:0; color:#333;">{item}</h4>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -122,4 +122,5 @@ st.subheader("🎲 Feeling Lucky?")
 if st.button("Surprise Me"):
     random_item = df.sample(1).iloc[0]["recommended_furniture"]
     st.info(f"✨ Surprise Pick: **{random_item}**")
+
 
