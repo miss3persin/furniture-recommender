@@ -73,22 +73,14 @@ if search_query.strip():
 # =====================
 def recommend_from_filtered(filtered_df, top_n=5):
     if filtered_df.empty:
-        return pd.DataFrame(columns=df.columns)
+        return []
 
-    # Use first valid row from filtered dataset as the "anchor"
     idx = filtered_df.index[0]
-
     scores = list(enumerate(similarity_matrix[idx]))
     scores = sorted(scores, key=lambda x: x[1], reverse=True)
 
     top_indices = [i[0] for i in scores[1:top_n+1]]
-    return df.iloc[top_indices][[
-        "apartment_type",
-        "location",
-        "budget_range",
-        "preferred_style",
-        "recommended_furniture"
-    ]]
+    return df.iloc[top_indices]["recommended_furniture"].tolist()
 
 recommendations = recommend_from_filtered(filtered_df)
 
@@ -98,33 +90,26 @@ recommendations = recommend_from_filtered(filtered_df)
 if not filtered_df.empty:
     top_pick = filtered_df.iloc[0]["recommended_furniture"]
     st.subheader(f"🎯 Top Pick: **{top_pick}**")
-    st.success(f"Based on your filters, we recommend starting with **{top_pick}**.")
 
 st.subheader("📋 Recommended Options")
-if recommendations.empty:
+if not recommendations:
     st.warning("No recommendations found. Try adjusting your filters.")
 else:
-    # Card-style display
-    for i, row in recommendations.iterrows():
-        st.markdown(f"""
-        ---
-        **{row['recommended_furniture']}**
-        - 🏠 Apartment: {row['apartment_type']}
-        - 📍 Location: {row['location']}
-        - 💰 Budget: {row['budget_range']}
-        - 🎨 Style: {row['preferred_style']}
-        """)
+    for i, item in enumerate(recommendations, start=1):
+        with st.container():
+            st.markdown(
+                f"""
+                <div style="padding:15px; border-radius:12px; background-color:#f9f9f9; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+                    <h4 style="margin:0;">{i}. {item}</h4>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 # =====================
 # Surprise Me Feature
 # =====================
 st.subheader("🎲 Feeling Lucky?")
 if st.button("Surprise Me"):
-    random_row = df.sample(1).iloc[0]
-    st.info(f"✨ Surprise Pick: **{random_row['recommended_furniture']}**")
-    st.markdown(f"""
-    - 🏠 Apartment: {random_row['apartment_type']}
-    - 📍 Location: {random_row['location']}
-    - 💰 Budget: {random_row['budget_range']}
-    - 🎨 Style: {random_row['preferred_style']}
-    """)
+    random_item = df.sample(1).iloc[0]["recommended_furniture"]
+    st.info(f"✨ Surprise Pick: **{random_item}**")
