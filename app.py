@@ -74,14 +74,12 @@ def recommend_from_filtered(filtered_df, top_n=5):
     if filtered_df.empty:
         return pd.DataFrame(columns=df.columns)
 
-    # Pick first valid row from filtered dataset
+    # Use first valid row from filtered dataset as the "anchor"
     idx = filtered_df.index[0]
 
-    # Compute similarity scores for that row
     scores = list(enumerate(similarity_matrix[idx]))
     scores = sorted(scores, key=lambda x: x[1], reverse=True)
 
-    # Top N recommendations (excluding the item itself at index 0)
     top_indices = [i[0] for i in scores[1:top_n+1]]
     return df.iloc[top_indices][[
         "apartment_type",
@@ -99,7 +97,7 @@ recommendations = recommend_from_filtered(filtered_df)
 if not filtered_df.empty:
     top_pick = filtered_df.iloc[0]["recommended_furniture"]
     st.subheader(f"🎯 Top Pick: **{top_pick}**")
-    st.write(f"Based on your choices, we recommend starting with **{top_pick}**.")
+    st.success(f"Based on your filters, we recommend starting with **{top_pick}**.")
 
 st.subheader("📋 Recommended Options")
 if recommendations.empty:
